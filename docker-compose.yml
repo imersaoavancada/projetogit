@@ -1,0 +1,25 @@
+networks:
+  traefik-public:
+    external: true
+
+services:
+  api:
+    image: ghcr.io/imersaoavancada/projetogit:2.0.1
+    networks:
+      - traefik-public
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.http.routers.projetogit-http.rule=Host(`projetogit.venda.plus`)
+        - traefik.http.routers.projetogit-http.entrypoints=http
+        - traefik.http.routers.projetogit-http.middlewares=https-redirect
+        - traefik.http.routers.projetogit-http.service=projetogit
+        - traefik.http.routers.projetogit-https.rule=Host(`projetogit.venda.plus`)
+        - traefik.http.routers.projetogit-https.entrypoints=https
+        - traefik.http.routers.projetogit-https.service=projetogit
+        - traefik.http.routers.projetogit-https.tls=true
+        - traefik.http.routers.projetogit-https.tls.certresolver=le
+        - traefik.http.services.projetogit.loadbalancer.server.port=8000
